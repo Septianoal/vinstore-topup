@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: vinstore-topup
+  datasource:
+    url: jdbc:postgresql://localhost:5432/vinstore
+    username: vinstore
+    password: ganti_password_ini
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+
+server:
+  port: 8080

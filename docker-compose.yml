@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:17
+    container_name: vinstore-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: vinstore
+      POSTGRES_USER: vinstore
+      POSTGRES_PASSWORD: ganti_password_ini
+    ports:
+      - "5432:5432"
+    volumes:
+      - vinstore-data:/var/lib/postgresql/data
+
+volumes:
+  vinstore-data:
