@@ -1,6 +1,6 @@
 package com.vinstore.topup.repository;
 
-import com.vinstore.topup.Game;
+import com.vinstore.topup.entity.Game;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
