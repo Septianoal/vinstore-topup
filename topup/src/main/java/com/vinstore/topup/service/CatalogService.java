@@ -1,9 +1,9 @@
 package com.vinstore.topup.service;
 
-import com.vinstore.topup.Game;
-import com.vinstore.topup.Product;
 import com.vinstore.topup.dto.GameResponse;
 import com.vinstore.topup.dto.ProductResponse;
+import com.vinstore.topup.entity.Game;
+import com.vinstore.topup.entity.Product;
 import com.vinstore.topup.repository.GameRepository;
 import com.vinstore.topup.repository.ProductRepository;
 import java.util.List;
