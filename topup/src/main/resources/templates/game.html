@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${game.name()} + ' - VinStore'">Game</title>
+    <style>
+        body { font-family: sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; }
+        .item { display: flex; justify-content: space-between; padding: 1rem; margin-bottom: 0.5rem;
+                border: 1px solid #ccc; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <a th:href="@{/}">&larr; Kembali</a>
+    <h1 th:text="${game.name()}">Nama Game</h1>
+    <p>Pilih nominal top up:</p>
+    <div class="item" th:each="product : ${products}">
+        <span th:text="${product.name()}">86 Diamonds</span>
+        <strong th:text="'Rp ' + ${#numbers.formatDecimal(product.price(), 0, 'POINT', 0, 'COMMA')}">Rp 22.000</strong>
+    </div>
+    <p th:if="${#lists.isEmpty(products)}">Belum ada produk untuk game ini.</p>
+</body>
+</html>
