@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>VinStore Top Up</title>
+    <style>
+        body { font-family: sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; }
+        .card { display: block; padding: 1rem; margin-bottom: 0.75rem; border: 1px solid #ccc;
+                border-radius: 8px; text-decoration: none; color: inherit; }
+        .card:hover { background: #f3f3f3; }
+    </style>
+</head>
+<body>
+    <h1>VinStore Top Up</h1>
+    <p>Pilih game yang ingin di-top up:</p>
+    <a class="card" th:each="game : ${games}" th:href="@{/games/{slug}(slug=${game.slug()})}">
+        <strong th:text="${game.name()}">Nama Game</strong>
+    </a>
+</body>
+</html>
