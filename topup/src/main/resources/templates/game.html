@@ -7,17 +7,41 @@
     <style>
         body { font-family: sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; }
         .item { display: flex; justify-content: space-between; padding: 1rem; margin-bottom: 0.5rem;
-                border: 1px solid #ccc; border-radius: 8px; }
+                border: 1px solid #ccc; border-radius: 8px; cursor: pointer; }
+        .error { color: #b00020; font-size: 0.9rem; margin: 0.25rem 0 0.75rem; }
+        input[type=text] { width: 100%; padding: 0.6rem; box-sizing: border-box; }
+        button { padding: 0.75rem 1.5rem; font-size: 1rem; cursor: pointer; }
     </style>
 </head>
 <body>
     <a th:href="@{/}">&larr; Kembali</a>
     <h1 th:text="${game.name()}">Nama Game</h1>
-    <p>Pilih nominal top up:</p>
-    <div class="item" th:each="product : ${products}">
-        <span th:text="${product.name()}">86 Diamonds</span>
-        <strong th:text="'Rp ' + ${#numbers.formatDecimal(product.price(), 0, 'POINT', 0, 'COMMA')}">Rp 22.000</strong>
-    </div>
-    <p th:if="${#lists.isEmpty(products)}">Belum ada produk untuk game ini.</p>
+
+    <form th:action="@{/games/{slug}/order(slug=${game.slug()})}" th:object="${orderForm}" method="post">
+        <p>Pilih nominal top up:</p>
+        <label class="item" th:each="product : ${products}">
+            <span>
+                <input type="radio" th:field="*{productId}" th:value="${product.id()}">
+                <span th:text="${product.name()}">86 Diamonds</span>
+            </span>
+            <strong th:text="'Rp ' + ${#numbers.formatDecimal(product.price(), 0, 'POINT', 0, 'COMMA')}">Rp 22.000</strong>
+        </label>
+        <p th:if="${#lists.isEmpty(products)}">Belum ada produk untuk game ini.</p>
+        <p class="error" th:if="${#fields.hasErrors('productId')}" th:errors="*{productId}">Error</p>
+
+        <p>
+            <label for="gameUserId" th:text="${game.userIdLabel()}">User ID</label><br>
+            <input type="text" id="gameUserId" th:field="*{gameUserId}">
+        </p>
+        <p class="error" th:if="${#fields.hasErrors('gameUserId')}" th:errors="*{gameUserId}">Error</p>
+
+        <p>
+            <label for="contact">Email atau nomor WhatsApp</label><br>
+            <input type="text" id="contact" th:field="*{contact}">
+        </p>
+        <p class="error" th:if="${#fields.hasErrors('contact')}" th:errors="*{contact}">Error</p>
+
+        <button type="submit">Pesan sekarang</button>
+    </form>
 </body>
 </html>

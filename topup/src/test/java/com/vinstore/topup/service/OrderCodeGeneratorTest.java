@@ -1,8 +1,7 @@
-package com.vinstore.topup;
+package com.vinstore.topup.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.vinstore.topup.service.OrderCodeGenerator;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.Test;

@@ -1,5 +1,6 @@
 package com.vinstore.topup.controller;
 
+import com.vinstore.topup.dto.OrderForm;
 import com.vinstore.topup.service.CatalogService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,6 +26,7 @@ public class HomeController {
     public String gameDetail(@PathVariable String slug, Model model) {
         model.addAttribute("game", catalogService.getGame(slug));
         model.addAttribute("products", catalogService.listProducts(slug));
+        model.addAttribute("orderForm", new OrderForm());
         return "game";
     }
 }
