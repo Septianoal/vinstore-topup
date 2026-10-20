@@ -4,6 +4,7 @@ import com.vinstore.topup.dto.OrderForm;
 import com.vinstore.topup.dto.OrderResponse;
 import com.vinstore.topup.service.CatalogService;
 import com.vinstore.topup.service.OrderService;
+import com.vinstore.topup.service.PaymentService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,10 +19,14 @@ public class OrderController {
 
     private final OrderService orderService;
     private final CatalogService catalogService;
+    private final PaymentService paymentService;
 
-    public OrderController(OrderService orderService, CatalogService catalogService) {
+    public OrderController(OrderService orderService,
+                           CatalogService catalogService,
+                           PaymentService paymentService) {
         this.orderService = orderService;
         this.catalogService = catalogService;
+        this.paymentService = paymentService;
     }
 
     @PostMapping("/games/{slug}/order")
@@ -42,5 +47,11 @@ public class OrderController {
     public String orderDetail(@PathVariable String orderCode, Model model) {
         model.addAttribute("order", orderService.getOrder(orderCode));
         return "order";
+    }
+
+    @PostMapping("/orders/{orderCode}/pay")
+    public String pay(@PathVariable String orderCode) {
+        String gatewayRef = paymentService.startPayment(orderCode);
+        return "redirect:/sandbox/pay/" + gatewayRef;
     }
 }

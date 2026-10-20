@@ -58,6 +58,23 @@ public class TopupOrder {
         this.createdAt = LocalDateTime.now();
     }
 
+    public void markPaid() {
+        requirePending();
+        this.status = OrderStatus.PAID;
+    }
+
+    public void markFailed() {
+        requirePending();
+        this.status = OrderStatus.FAILED;
+    }
+
+    private void requirePending() {
+        if (this.status != OrderStatus.PENDING) {
+            throw new IllegalStateException("Order " + orderCode + " tidak berstatus PENDING");
+        }
+    }
+
+
     public Long getId() { return id; }
     public String getOrderCode() { return orderCode; }
     public Product getProduct() { return product; }
