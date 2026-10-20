@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gateway Sandbox</title>
+    <style>
+        body { font-family: sans-serif; max-width: 520px; margin: 2rem auto; padding: 0 1rem; }
+        .warn { background: #fff4d6; border: 1px solid #e0b84a; padding: 0.75rem; border-radius: 8px; }
+        table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+        td { padding: 0.6rem; border-bottom: 1px solid #ddd; }
+        td:first-child { color: #555; width: 45%; }
+        button { padding: 0.75rem 1.25rem; font-size: 1rem; cursor: pointer; margin-right: 0.5rem; }
+    </style>
+</head>
+<body>
+    <h1>Gateway Sandbox</h1>
+    <p class="warn">Halaman ini tiruan untuk latihan. Tidak ada uang sungguhan.</p>
+
+    <table>
+        <tr><td>Nomor pembayaran</td><td th:text="${payment.gatewayRef()}">PAY-123</td></tr>
+        <tr><td>Kode order</td><td th:text="${payment.orderCode()}">VS-261018-A7K2Q9</td></tr>
+        <tr><td>Jumlah</td><td th:text="'Rp ' + ${#numbers.formatDecimal(payment.amount(), 0, 'POINT', 0, 'COMMA')}">Rp 10.000</td></tr>
+        <tr><td>Status</td><td th:text="${payment.status()}">PENDING</td></tr>
+    </table>
+
+    <div th:if="${payment.status() == 'PENDING'}">
+        <form th:action="@{/sandbox/pay/{ref}/complete(ref=${payment.gatewayRef()})}" method="post" style="display:inline">
+            <input type="hidden" name="result" value="PAID">
+            <button type="submit">Bayar (sukses)</button>
+        </form>
+        <form th:action="@{/sandbox/pay/{ref}/complete(ref=${payment.gatewayRef()})}" method="post" style="display:inline">
+            <input type="hidden" name="result" value="FAILED">
+            <button type="submit">Gagalkan pembayaran</button>
+        </form>
+    </div>
+    <p th:if="${payment.status() != 'PENDING'}">Pembayaran ini sudah diproses.</p>
+
+    <p><a th:href="@{/orders/{code}(code=${payment.orderCode()})}">&larr; Kembali ke order</a></p>
+</body>
+</html>

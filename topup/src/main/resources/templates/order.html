@@ -3,19 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Order Dibuat - VinStore</title>
+    <title>Order - VinStore</title>
     <style>
         body { font-family: sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; }
         table { border-collapse: collapse; width: 100%; }
         td { padding: 0.6rem; border-bottom: 1px solid #ddd; }
         td:first-child { color: #555; width: 40%; }
         .code { font-size: 1.5rem; font-weight: bold; letter-spacing: 1px; }
+        .ok { color: #1b7a34; font-weight: bold; }
+        .bad { color: #b00020; font-weight: bold; }
+        button { padding: 0.75rem 1.5rem; font-size: 1rem; cursor: pointer; }
     </style>
 </head>
 <body>
-    <h1>Order berhasil dibuat</h1>
+    <h1>Detail order</h1>
     <p>Simpan kode order ini:</p>
-    <p class="code" th:text="${order.orderCode()}">VS-261017-A7K2Q9</p>
+    <p class="code" th:text="${order.orderCode()}">VS-261018-A7K2Q9</p>
 
     <table>
         <tr><td>Game</td><td th:text="${order.gameName()}">Mobile Legends</td></tr>
@@ -24,10 +27,18 @@
         <tr><td>Kontak</td><td th:text="${order.contact()}">email@contoh.com</td></tr>
         <tr><td>Total</td><td th:text="'Rp ' + ${#numbers.formatDecimal(order.totalPrice(), 0, 'POINT', 0, 'COMMA')}">Rp 22.000</td></tr>
         <tr><td>Status</td><td th:text="${order.status()}">PENDING</td></tr>
-        <tr><td>Dibuat</td><td th:text="${#temporals.format(order.createdAt(), 'dd MMM yyyy HH:mm')}">17 Okt 2026 12:00</td></tr>
+        <tr><td>Dibuat</td><td th:text="${#temporals.format(order.createdAt(), 'dd MMM yyyy HH:mm')}">18 Okt 2026 12:00</td></tr>
     </table>
 
-    <p>Pembayaran akan tersedia pada tahap berikutnya.</p>
+    <div th:if="${order.status() == 'PENDING'}">
+        <p>Selesaikan pembayaran supaya top up diproses.</p>
+        <form th:action="@{/orders/{code}/pay(code=${order.orderCode()})}" method="post">
+            <button type="submit">Bayar sekarang</button>
+        </form>
+    </div>
+    <p class="ok" th:if="${order.status() == 'PAID'}">Pembayaran diterima. Top up akan segera diproses.</p>
+    <p class="bad" th:if="${order.status() == 'FAILED'}">Pembayaran gagal. Silakan buat order baru.</p>
+
     <p><a th:href="@{/}">&larr; Kembali ke beranda</a></p>
 </body>
 </html>
