@@ -30,6 +30,25 @@ public class Game {
     @Column(nullable = false)
     private boolean active;
 
+    protected Game() {
+    }
+
+    public Game(String name, String slug, String imageUrl, String userIdLabel) {
+        this.name = name;
+        this.slug = slug;
+        this.imageUrl = imageUrl;
+        this.userIdLabel = userIdLabel;
+        this.active = true;
+    }
+
+    public void update(String name, String slug, String imageUrl, String userIdLabel, boolean active) {
+        this.name = name;
+        this.slug = slug;
+        this.imageUrl = imageUrl;
+        this.userIdLabel = userIdLabel;
+        this.active = active;
+    }
+
     public Long getId() { return id; }
     public String getName() { return name; }
     public String getSlug() { return slug; }

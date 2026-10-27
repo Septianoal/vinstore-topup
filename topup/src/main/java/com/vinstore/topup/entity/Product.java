@@ -32,6 +32,22 @@ public class Product {
     @Column(nullable = false)
     private boolean active;
 
+        protected Product() {
+    }
+
+    public Product(Game game, String name, BigDecimal price) {
+        this.game = game;
+        this.name = name;
+        this.price = price;
+        this.active = true;
+    }
+
+    public void update(String name, BigDecimal price, boolean active) {
+        this.name = name;
+        this.price = price;
+        this.active = active;
+    }
+
     public Long getId() { return id; }
     public Game getGame() { return game; }
     public String getName() { return name; }
