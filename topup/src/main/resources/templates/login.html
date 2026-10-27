@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login Admin - VinStore</title>
+    <style>
+        body { font-family: sans-serif; max-width: 360px; margin: 4rem auto; padding: 0 1rem; }
+        input { width: 100%; padding: 0.6rem; box-sizing: border-box; margin-bottom: 1rem; }
+        button { padding: 0.75rem 1.5rem; font-size: 1rem; cursor: pointer; }
+        .error { color: #b00020; }
+        .info { color: #1b7a34; }
+    </style>
+</head>
+<body>
+    <h1>Login Admin</h1>
+    <p class="error" th:if="${param.error}">Username atau password salah.</p>
+    <p class="info" th:if="${param.logout}">Kamu sudah keluar.</p>
+
+    <form th:action="@{/login}" method="post">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" autofocus required>
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required>
+        <button type="submit">Masuk</button>
+    </form>
+
+    <p><a th:href="@{/}">&larr; Kembali ke beranda</a></p>
+</body>
+</html>
