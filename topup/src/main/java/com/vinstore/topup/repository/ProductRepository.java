@@ -6,5 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
+    List<Product> findByGameIdOrderByPriceAsc(Long gameId);
+
     List<Product> findByGameIdAndActiveTrueOrderByPriceAsc(Long gameId);
 }

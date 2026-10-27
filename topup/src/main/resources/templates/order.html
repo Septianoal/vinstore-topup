@@ -1,44 +1,388 @@
 <!DOCTYPE html>
-<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Order - VinStore</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="'Order ' + ${order.orderCode()} + ' — VinStore'">Order — VinStore</title>
     <style>
-        body { font-family: sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; }
-        table { border-collapse: collapse; width: 100%; }
-        td { padding: 0.6rem; border-bottom: 1px solid #ddd; }
-        td:first-child { color: #555; width: 40%; }
-        .code { font-size: 1.5rem; font-weight: bold; letter-spacing: 1px; }
-        .ok { color: #1b7a34; font-weight: bold; }
-        .bad { color: #b00020; font-weight: bold; }
-        button { padding: 0.75rem 1.5rem; font-size: 1rem; cursor: pointer; }
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: #0f0d15;
+            color: #e4e4e7;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── decorative orbs ── */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: .18;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .orb-1 { width: 500px; height: 500px; background: #7c3aed; top: -120px; left: -160px; }
+        .orb-2 { width: 420px; height: 420px; background: #ec4899; bottom: -100px; right: -140px; }
+        .orb-3 { width: 300px; height: 300px; background: #a855f7; top: 50%; left: 60%; }
+
+        /* ── navbar ── */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 18px 24px;
+            background: rgba(15, 13, 21, .75);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-bottom: 1px solid rgba(255,255,255,.06);
+        }
+        .brand {
+            font-size: 1.35rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #7c3aed, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -.3px;
+        }
+
+        /* ── main ── */
+        .main {
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 48px 20px 64px;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        /* ── section heading ── */
+        .page-heading {
+            font-size: 1.75rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 32px;
+            background: linear-gradient(135deg, #c4b5fd, #f0abfc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ── order code showcase ── */
+        .code-card {
+            position: relative;
+            padding: 2px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #7c3aed, #a855f7, #ec4899);
+            margin-bottom: 28px;
+        }
+        .code-card-inner {
+            background: rgba(15, 13, 21, .92);
+            border-radius: 16px;
+            padding: 28px 24px;
+            text-align: center;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .code-label {
+            font-size: .8rem;
+            text-transform: uppercase;
+            letter-spacing: 1.6px;
+            color: #a1a1aa;
+            margin-bottom: 10px;
+        }
+        .code-value {
+            font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+            font-size: 1.55rem;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            background: linear-gradient(135deg, #7c3aed, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            word-break: break-all;
+            user-select: all;
+        }
+
+        /* ── glass card ── */
+        .glass-card {
+            background: rgba(255,255,255,.05);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 16px;
+            padding: 28px 24px;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            margin-bottom: 24px;
+        }
+
+        /* ── detail rows ── */
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 13px 0;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        .detail-label {
+            font-size: .88rem;
+            color: #a1a1aa;
+            flex-shrink: 0;
+            margin-right: 16px;
+        }
+        .detail-value {
+            font-size: .95rem;
+            font-weight: 600;
+            color: #ffffff;
+            text-align: right;
+            word-break: break-word;
+        }
+        .detail-value.price {
+            font-size: 1.05rem;
+            background: linear-gradient(135deg, #7c3aed, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ── status badges ── */
+        .badge {
+            display: inline-block;
+            font-size: .78rem;
+            font-weight: 700;
+            letter-spacing: .6px;
+            padding: 5px 14px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+        .badge-pending {
+            background: rgba(245, 158, 11, .15);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, .3);
+        }
+        .badge-paid {
+            background: rgba(34,197,94,.15);
+            color: #4ade80;
+            border: 1px solid rgba(34,197,94,.3);
+        }
+        .badge-failed {
+            background: rgba(239,68,68,.15);
+            color: #f87171;
+            border: 1px solid rgba(239,68,68,.3);
+        }
+
+        /* ── action cards (pending / paid / failed) ── */
+        .action-card {
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            text-align: center;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+        .action-card.pending-card {
+            background: rgba(245,158,11,.08);
+            border: 1px solid rgba(245,158,11,.2);
+        }
+        .action-card.success-card {
+            background: rgba(34,197,94,.08);
+            border: 1px solid rgba(34,197,94,.2);
+        }
+        .action-card.failed-card {
+            background: rgba(239,68,68,.08);
+            border: 1px solid rgba(239,68,68,.2);
+        }
+        .action-icon {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        .action-text {
+            font-size: .92rem;
+            line-height: 1.5;
+            color: #d4d4d8;
+            margin-bottom: 18px;
+        }
+        .action-text.no-mb {
+            margin-bottom: 0;
+        }
+        .action-text-success {
+            color: #86efac;
+        }
+        .action-text-failed {
+            color: #fca5a5;
+        }
+
+        /* ── pay button ── */
+        .btn-pay {
+            display: inline-block;
+            padding: 14px 40px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #ffffff;
+            background: linear-gradient(135deg, #7c3aed, #a855f7, #ec4899);
+            cursor: pointer;
+            transition: transform .2s, box-shadow .2s;
+            box-shadow: 0 4px 24px rgba(124,58,237,.35);
+            letter-spacing: .2px;
+        }
+        .btn-pay:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(168,85,247,.45);
+        }
+        .btn-pay:active {
+            transform: translateY(0);
+        }
+
+        /* ── back link ── */
+        .back-link {
+            display: inline-block;
+            margin-top: 8px;
+            text-align: center;
+            width: 100%;
+            font-size: .92rem;
+            color: #a78bfa;
+            text-decoration: none;
+            transition: color .2s;
+        }
+        .back-link:hover {
+            color: #c4b5fd;
+        }
+
+        /* ── footer ── */
+        .footer {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 28px 20px;
+            font-size: .78rem;
+            color: #52525b;
+            border-top: 1px solid rgba(255,255,255,.05);
+        }
+
+        /* ── responsive ── */
+        @media (max-width: 480px) {
+            .code-value { font-size: 1.15rem; }
+            .page-heading { font-size: 1.4rem; }
+            .glass-card { padding: 20px 16px; }
+            .detail-row { flex-direction: column; align-items: flex-start; gap: 4px; }
+            .detail-value { text-align: left; }
+        }
     </style>
 </head>
 <body>
-    <h1>Detail order</h1>
-    <p>Simpan kode order ini:</p>
-    <p class="code" th:text="${order.orderCode()}">VS-261018-A7K2Q9</p>
 
-    <table>
-        <tr><td>Game</td><td th:text="${order.gameName()}">Mobile Legends</td></tr>
-        <tr><td>Nominal</td><td th:text="${order.productName()}">86 Diamonds</td></tr>
-        <tr><td>User ID</td><td th:text="${order.gameUserId()}">12345</td></tr>
-        <tr><td>Kontak</td><td th:text="${order.contact()}">email@contoh.com</td></tr>
-        <tr><td>Total</td><td th:text="'Rp ' + ${#numbers.formatDecimal(order.totalPrice(), 0, 'POINT', 0, 'COMMA')}">Rp 22.000</td></tr>
-        <tr><td>Status</td><td th:text="${order.status()}">PENDING</td></tr>
-        <tr><td>Dibuat</td><td th:text="${#temporals.format(order.createdAt(), 'dd MMM yyyy HH:mm')}">18 Okt 2026 12:00</td></tr>
-    </table>
+<!-- decorative orbs -->
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
 
-    <div th:if="${order.status() == 'PENDING'}">
-        <p>Selesaikan pembayaran supaya top up diproses.</p>
-        <form th:action="@{/orders/{code}/pay(code=${order.orderCode()})}" method="post">
-            <button type="submit">Bayar sekarang</button>
-        </form>
+<!-- navbar -->
+<nav class="navbar">
+    <span class="brand">🎮 VinStore</span>
+</nav>
+
+<!-- main -->
+<main class="main">
+    <div class="container">
+
+        <h1 class="page-heading">Detail Order</h1>
+
+        <!-- order code showcase -->
+        <div class="code-card">
+            <div class="code-card-inner">
+                <div class="code-label">Order Code</div>
+                <div class="code-value" th:text="${order.orderCode()}">ORD-XXXXX</div>
+            </div>
+        </div>
+
+        <!-- order details -->
+        <div class="glass-card">
+            <div class="detail-row">
+                <span class="detail-label">Game</span>
+                <span class="detail-value" th:text="${order.gameName()}">—</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Nominal</span>
+                <span class="detail-value" th:text="${order.productName()}">—</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">User ID</span>
+                <span class="detail-value" th:text="${order.gameUserId()}">—</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Kontak</span>
+                <span class="detail-value" th:text="${order.contact()}">—</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Total</span>
+                <span class="detail-value price" th:text="'Rp ' + ${#numbers.formatDecimal(order.totalPrice(), 0, 'POINT', 0, 'COMMA')}">Rp 0</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Status</span>
+                <span class="detail-value">
+                    <span class="badge badge-pending" th:if="${order.status() == 'PENDING'}" th:text="${order.status()}">PENDING</span>
+                    <span class="badge badge-paid" th:if="${order.status() == 'PAID'}" th:text="${order.status()}">PAID</span>
+                    <span class="badge badge-failed" th:if="${order.status() == 'FAILED'}" th:text="${order.status()}">FAILED</span>
+                </span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Dibuat</span>
+                <span class="detail-value" th:text="${#temporals.format(order.createdAt(), 'dd MMM yyyy HH:mm')}">—</span>
+            </div>
+        </div>
+
+        <!-- PENDING action -->
+        <div class="action-card pending-card" th:if="${order.status() == 'PENDING'}">
+            <div class="action-icon">⏳</div>
+            <p class="action-text">Selesaikan pembayaran supaya top up diproses.</p>
+            <form th:action="@{/orders/{code}/pay(code=${order.orderCode()})}" method="post">
+                <button type="submit" class="btn-pay">Bayar Sekarang 💳</button>
+            </form>
+        </div>
+
+        <!-- PAID action -->
+        <div class="action-card success-card" th:if="${order.status() == 'PAID'}">
+            <div class="action-icon">✅</div>
+            <p class="action-text action-text-success no-mb">Pembayaran diterima. Top up akan segera diproses.</p>
+        </div>
+
+        <!-- FAILED action -->
+        <div class="action-card failed-card" th:if="${order.status() == 'FAILED'}">
+            <div class="action-icon">❌</div>
+            <p class="action-text action-text-failed no-mb">Pembayaran gagal. Silakan buat order baru.</p>
+        </div>
+
+        <!-- back link -->
+        <a th:href="@{/}" class="back-link">← Kembali ke beranda</a>
+
     </div>
-    <p class="ok" th:if="${order.status() == 'PAID'}">Pembayaran diterima. Top up akan segera diproses.</p>
-    <p class="bad" th:if="${order.status() == 'FAILED'}">Pembayaran gagal. Silakan buat order baru.</p>
+</main>
 
-    <p><a th:href="@{/}">&larr; Kembali ke beranda</a></p>
+<!-- footer -->
+<footer class="footer">
+    &copy; 2025 VinStore. All rights reserved.
+</footer>
+
 </body>
 </html>

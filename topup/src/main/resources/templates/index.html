@@ -1,21 +1,381 @@
 <!DOCTYPE html>
-<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>VinStore Top Up</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>VinStore — Top Up Game Terpercaya</title>
     <style>
-        body { font-family: sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; }
-        .card { display: block; padding: 1rem; margin-bottom: 0.75rem; border: 1px solid #ccc;
-                border-radius: 8px; text-decoration: none; color: inherit; }
-        .card:hover { background: #f3f3f3; }
+        /* ===== RESET & BASE ===== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #0f0d15;
+            color: #e4e4e7;
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ===== DECORATIVE BACKGROUND ORBS ===== */
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            filter: blur(120px);
+            opacity: 0.35;
+        }
+
+        body::before {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, #7c3aed 0%, transparent 70%);
+            top: -150px;
+            left: -150px;
+        }
+
+        body::after {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, #ec4899 0%, transparent 70%);
+            bottom: -100px;
+            right: -100px;
+        }
+
+        /* third orb via a wrapper */
+        .page-wrapper::before {
+            content: '';
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, #a855f7 0%, transparent 70%);
+            top: 50%;
+            left: 60%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            filter: blur(140px);
+            opacity: 0.2;
+        }
+
+        .page-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .brand {
+            font-size: 1.6rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #7c3aed, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #a1a1aa;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.25s ease;
+        }
+
+        .nav-links a:hover {
+            color: #e4e4e7;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem 3rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, #7c3aed, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            color: #a1a1aa;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            max-width: 550px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* ===== SECTION ===== */
+        .section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 2rem 4rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 2rem;
+        }
+
+        /* ===== GAME GRID ===== */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 640px) {
+            .game-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 960px) {
+            .game-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* ===== CARD ===== */
+        .game-card {
+            display: block;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .game-card:hover {
+            transform: scale(1.03);
+            box-shadow:
+                0 0 20px rgba(168, 85, 247, 0.25),
+                0 0 60px rgba(168, 85, 247, 0.1),
+                0 8px 32px rgba(0, 0, 0, 0.4);
+            border-color: rgba(168, 85, 247, 0.3);
+        }
+
+        .game-card:active {
+            transform: scale(1.01);
+        }
+
+        /* Card image area */
+        .card-image {
+            position: relative;
+            height: 160px;
+            overflow: hidden;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.4s ease;
+        }
+
+        .game-card:hover .card-image img {
+            transform: scale(1.08);
+        }
+
+        .card-image-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1e1b2e 0%, #2d1a4e 50%, #1e1b2e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            user-select: none;
+        }
+
+        /* Card body */
+        .card-body {
+            padding: 1.15rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+
+        .card-name {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-action {
+            flex-shrink: 0;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #a855f7;
+            transition: color 0.25s ease;
+            white-space: nowrap;
+        }
+
+        .game-card:hover .card-action {
+            color: #ec4899;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            padding: 2.5rem 2rem;
+            color: #52525b;
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #71717a;
+        }
+
+        .empty-state span {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero {
+            animation: fadeInUp 0.7s ease-out;
+        }
+
+        .game-card {
+            animation: fadeInUp 0.5s ease-out both;
+        }
+
+        .game-card:nth-child(1)  { animation-delay: 0.05s; }
+        .game-card:nth-child(2)  { animation-delay: 0.1s; }
+        .game-card:nth-child(3)  { animation-delay: 0.15s; }
+        .game-card:nth-child(4)  { animation-delay: 0.2s; }
+        .game-card:nth-child(5)  { animation-delay: 0.25s; }
+        .game-card:nth-child(6)  { animation-delay: 0.3s; }
+        .game-card:nth-child(7)  { animation-delay: 0.35s; }
+        .game-card:nth-child(8)  { animation-delay: 0.4s; }
+        .game-card:nth-child(9)  { animation-delay: 0.45s; }
+        .game-card:nth-child(10) { animation-delay: 0.5s; }
+        .game-card:nth-child(11) { animation-delay: 0.55s; }
+        .game-card:nth-child(12) { animation-delay: 0.6s; }
+        .game-card:nth-child(n+13) { animation-delay: 0.65s; }
     </style>
 </head>
 <body>
-    <h1>VinStore Top Up</h1>
-    <p>Pilih game yang ingin di-top up:</p>
-    <a class="card" th:each="game : ${games}" th:href="@{/games/{slug}(slug=${game.slug()})}">
-        <strong th:text="${game.name()}">Nama Game</strong>
-    </a>
+<div class="page-wrapper">
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar">
+        <div class="brand">🎮 VinStore</div>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+        </ul>
+    </nav>
+
+    <!-- ===== HERO ===== -->
+    <section class="hero">
+        <h1>Top Up Game Favoritmu</h1>
+        <p>Cepat, aman, dan terpercaya. Pilih game dan top up sekarang!</p>
+    </section>
+
+    <!-- ===== GAME LIST ===== -->
+    <section class="section">
+        <h2 class="section-title">🔥 Game Populer</h2>
+
+        <div class="game-grid" th:if="${games != null and !games.isEmpty()}">
+            <a class="game-card"
+               th:each="game : ${games}"
+               th:href="@{/games/{slug}(slug=${game.slug()})}">
+
+                <div class="card-image">
+                    <!-- Show actual image if imageUrl is present -->
+                    <img th:if="${game.imageUrl() != null}"
+                         th:src="${game.imageUrl()}"
+                         th:alt="${game.name()}"
+                         loading="lazy"/>
+                    <!-- Gradient placeholder if no image -->
+                    <div class="card-image-placeholder"
+                         th:if="${game.imageUrl() == null}">🎮</div>
+                </div>
+
+                <div class="card-body">
+                    <span class="card-name" th:text="${game.name()}">Game Name</span>
+                    <span class="card-action">Top Up →</span>
+                </div>
+            </a>
+        </div>
+
+        <!-- Empty state when no games -->
+        <div class="empty-state" th:if="${games == null or games.isEmpty()}">
+            <span>🎮</span>
+            <p>Belum ada game tersedia saat ini.</p>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        &copy; 2026 VinStore. All rights reserved.
+    </footer>
+
+</div>
 </body>
 </html>

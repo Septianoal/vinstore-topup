@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Game')}"></head>
+<body>
+<nav th:replace="~{fragments :: nav}"></nav>
+<h1>Game</h1>
+<p><a class="button" th:href="@{/admin/games/new}">+ Tambah game</a></p>
+<table>
+    <thead><tr><th>Nama</th><th>Slug</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    <tr th:each="game : ${games}">
+        <td th:text="${game.name}">Nama</td>
+        <td th:text="${game.slug}">slug</td>
+        <td th:text="${game.active} ? 'Aktif' : 'Nonaktif'">Aktif</td>
+        <td>
+            <a th:href="@{/admin/games/{id}/edit(id=${game.id})}">Ubah</a> |
+            <a th:href="@{/admin/games/{id}/products(id=${game.id})}">Produk</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

@@ -1,5 +1,6 @@
 package com.vinstore.topup.service;
 
+import com.vinstore.topup.entity.OrderStatus;   
 import com.vinstore.topup.dto.OrderForm;
 import com.vinstore.topup.dto.OrderResponse;
 import com.vinstore.topup.entity.Game;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import java.util.List;
 
 @Service
 public class OrderService {
@@ -74,6 +76,14 @@ public class OrderService {
         TopupOrder order = orderRepository.findByOrderCode(orderCode)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order tidak ditemukan"));
         return toResponse(order);
+    }
+
+        @Transactional(readOnly = true)
+    public List<OrderResponse> listOrders(OrderStatus status) {
+        List<TopupOrder> orders = (status == null)
+                ? orderRepository.findTop100ByOrderByCreatedAtDesc()
+                : orderRepository.findTop100ByStatusOrderByCreatedAtDesc(status);
+        return orders.stream().map(this::toResponse).toList();
     }
 
     private OrderResponse toResponse(TopupOrder o) {
