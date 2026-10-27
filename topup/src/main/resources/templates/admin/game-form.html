@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Form game')}"></head>
+<body>
+<nav th:replace="~{fragments :: nav}"></nav>
+<h1 th:text="${formTitle}">Tambah game</h1>
+
+<form th:action="@{${formAction}}" th:object="${gameForm}" method="post">
+    <p class="field">
+        <label for="name">Nama game</label><br>
+        <input type="text" id="name" th:field="*{name}">
+    </p>
+    <p class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Error</p>
+
+    <p class="field">
+        <label for="slug">Slug (untuk alamat web, contoh: free-fire)</label><br>
+        <input type="text" id="slug" th:field="*{slug}">
+    </p>
+    <p class="error" th:if="${#fields.hasErrors('slug')}" th:errors="*{slug}">Error</p>
+
+    <p class="field">
+        <label for="imageUrl">Alamat gambar (boleh kosong)</label><br>
+        <input type="text" id="imageUrl" th:field="*{imageUrl}">
+    </p>
+    <p class="error" th:if="${#fields.hasErrors('imageUrl')}" th:errors="*{imageUrl}">Error</p>
+
+    <p class="field">
+        <label for="userIdLabel">Label kolom ID pembeli (contoh: User ID + Zone ID)</label><br>
+        <input type="text" id="userIdLabel" th:field="*{userIdLabel}">
+    </p>
+    <p class="error" th:if="${#fields.hasErrors('userIdLabel')}" th:errors="*{userIdLabel}">Error</p>
+
+    <p th:if="${editing}">
+        <label><input type="checkbox" th:field="*{active}"> Aktif (tampil di toko)</label>
+    </p>
+
+    <button type="submit">Simpan</button>
+    <a th:href="@{/admin/games}">Batal</a>
+</form>
+</body>
+</html>

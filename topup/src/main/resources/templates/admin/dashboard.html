@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Beranda')}"></head>
+<body>
+<nav th:replace="~{fragments :: nav}"></nav>
+<h1>Panel Admin</h1>
+<ul>
+    <li><a th:href="@{/admin/games}">Kelola game dan produk</a></li>
+    <li><a th:href="@{/admin/orders}">Lihat daftar order</a></li>
+</ul>
+</body>
+</html>

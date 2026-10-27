@@ -1,41 +1,290 @@
 <!DOCTYPE html>
-<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Gateway Sandbox</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Gateway Sandbox — VinStore</title>
     <style>
-        body { font-family: sans-serif; max-width: 520px; margin: 2rem auto; padding: 0 1rem; }
-        .warn { background: #fff4d6; border: 1px solid #e0b84a; padding: 0.75rem; border-radius: 8px; }
-        table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
-        td { padding: 0.6rem; border-bottom: 1px solid #ddd; }
-        td:first-child { color: #555; width: 45%; }
-        button { padding: 0.75rem 1.25rem; font-size: 1rem; cursor: pointer; margin-right: 0.5rem; }
+        /* ── Reset & Base ─────────────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #0f0d15;
+            color: #e2e0ea;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* ── Background Orbs ──────────────────────────────────── */
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            filter: blur(100px);
+            opacity: .18;
+            z-index: 0;
+        }
+        body::before {
+            width: 420px; height: 420px;
+            background: #7c3aed;
+            top: -80px; left: -120px;
+        }
+        body::after {
+            width: 350px; height: 350px;
+            background: #ec4899;
+            bottom: -60px; right: -100px;
+        }
+
+        /* ── Navbar ───────────────────────────────────────────── */
+        .navbar {
+            position: sticky; top: 0; z-index: 100;
+            display: flex; align-items: center; justify-content: center;
+            padding: 16px 24px;
+            background: rgba(15, 13, 21, .75);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-bottom: 1px solid rgba(124, 58, 237, .2);
+        }
+        .navbar-brand {
+            font-size: 1.35rem; font-weight: 700;
+            background: linear-gradient(135deg, #7c3aed, #a855f7, #ec4899);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; color: transparent;
+            text-decoration: none;
+        }
+
+        /* ── Main Content ─────────────────────────────────────── */
+        .main {
+            flex: 1;
+            display: flex; flex-direction: column; align-items: center;
+            padding: 48px 20px 64px;
+            position: relative; z-index: 1;
+        }
+
+        .page-heading {
+            font-size: 1.65rem; font-weight: 700;
+            margin-bottom: 28px;
+            background: linear-gradient(135deg, #7c3aed, #a855f7, #ec4899);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; color: transparent;
+            text-align: center;
+        }
+
+        .content-wrapper {
+            width: 100%; max-width: 520px;
+            display: flex; flex-direction: column; gap: 22px;
+        }
+
+        /* ── Glass Card ───────────────────────────────────────── */
+        .glass-card {
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 16px;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            padding: 24px;
+        }
+
+        /* ── Warning Banner ───────────────────────────────────── */
+        .warning-banner {
+            background: rgba(245, 158, 11, .10);
+            border: 1px solid rgba(245, 158, 11, .25);
+            border-radius: 12px;
+            padding: 14px 18px;
+            display: flex; align-items: center; gap: 10px;
+            font-size: .9rem; color: #fbbf24;
+            line-height: 1.5;
+        }
+        .warning-banner .icon { font-size: 1.25rem; flex-shrink: 0; }
+
+        /* ── Detail Table ─────────────────────────────────────── */
+        .detail-table { width: 100%; border-collapse: collapse; }
+        .detail-table tr { border-bottom: 1px solid rgba(255, 255, 255, .06); }
+        .detail-table tr:last-child { border-bottom: none; }
+        .detail-table td { padding: 12px 4px; vertical-align: middle; }
+        .detail-table .label-col {
+            color: #9b97a8; font-size: .85rem; white-space: nowrap;
+            width: 145px;
+        }
+        .detail-table .value-col {
+            font-weight: 600; font-size: .95rem; color: #f0eef5;
+            text-align: right;
+        }
+
+        /* ── Status Badge ─────────────────────────────────────── */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 999px;
+            font-size: .78rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .5px;
+        }
+        .status-pending  { background: rgba(251,191,36,.15); color: #fbbf24; border: 1px solid rgba(251,191,36,.3); }
+        .status-paid      { background: rgba(34,197,94,.15);  color: #22c55e; border: 1px solid rgba(34,197,94,.3); }
+        .status-failed    { background: rgba(239,68,68,.15);  color: #ef4444; border: 1px solid rgba(239,68,68,.3); }
+        .status-expired   { background: rgba(107,114,128,.15); color: #9ca3af; border: 1px solid rgba(107,114,128,.3); }
+
+        /* ── Action Buttons ───────────────────────────────────── */
+        .action-row {
+            display: flex; gap: 14px;
+        }
+        .action-row form { flex: 1; }
+
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            width: 100%; padding: 14px 18px;
+            border: none; border-radius: 12px;
+            font-family: inherit; font-size: .95rem; font-weight: 700;
+            cursor: pointer; transition: all .2s ease;
+        }
+        .btn:hover { transform: translateY(-2px); }
+        .btn:active { transform: translateY(0); }
+
+        .btn-success {
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            color: #fff;
+            box-shadow: 0 4px 18px rgba(34, 197, 94, .3);
+        }
+        .btn-success:hover { box-shadow: 0 6px 24px rgba(34, 197, 94, .45); }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, .15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, .3);
+        }
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, .25);
+            box-shadow: 0 4px 18px rgba(239, 68, 68, .2);
+        }
+
+        /* ── Processed Message ────────────────────────────────── */
+        .processed-msg {
+            text-align: center;
+            padding: 18px;
+            color: #9b97a8;
+            font-size: .95rem;
+            background: rgba(255, 255, 255, .03);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, .06);
+        }
+
+        /* ── Back Link ────────────────────────────────────────── */
+        .back-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            color: #a78bfa;
+            text-decoration: none;
+            font-size: .9rem; font-weight: 500;
+            transition: color .2s;
+            margin-top: 4px;
+        }
+        .back-link:hover { color: #c4b5fd; }
+
+        /* ── Footer ───────────────────────────────────────────── */
+        .footer {
+            text-align: center;
+            padding: 28px 20px;
+            font-size: .78rem;
+            color: #5a5670;
+            border-top: 1px solid rgba(255, 255, 255, .05);
+            position: relative; z-index: 1;
+        }
+
+        /* ── Responsive ───────────────────────────────────────── */
+        @media (max-width: 480px) {
+            .main { padding: 32px 14px 48px; }
+            .page-heading { font-size: 1.35rem; }
+            .glass-card { padding: 18px; }
+            .action-row { flex-direction: column; gap: 10px; }
+            .detail-table .label-col { width: 120px; }
+        }
     </style>
 </head>
 <body>
-    <h1>Gateway Sandbox</h1>
-    <p class="warn">Halaman ini tiruan untuk latihan. Tidak ada uang sungguhan.</p>
 
-    <table>
-        <tr><td>Nomor pembayaran</td><td th:text="${payment.gatewayRef()}">PAY-123</td></tr>
-        <tr><td>Kode order</td><td th:text="${payment.orderCode()}">VS-261018-A7K2Q9</td></tr>
-        <tr><td>Jumlah</td><td th:text="'Rp ' + ${#numbers.formatDecimal(payment.amount(), 0, 'POINT', 0, 'COMMA')}">Rp 10.000</td></tr>
-        <tr><td>Status</td><td th:text="${payment.status()}">PENDING</td></tr>
-    </table>
+    <!-- ════ Navbar ════ -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">🎮 VinStore</a>
+    </nav>
 
-    <div th:if="${payment.status() == 'PENDING'}">
-        <form th:action="@{/sandbox/pay/{ref}/complete(ref=${payment.gatewayRef()})}" method="post" style="display:inline">
-            <input type="hidden" name="result" value="PAID">
-            <button type="submit">Bayar (sukses)</button>
-        </form>
-        <form th:action="@{/sandbox/pay/{ref}/complete(ref=${payment.gatewayRef()})}" method="post" style="display:inline">
-            <input type="hidden" name="result" value="FAILED">
-            <button type="submit">Gagalkan pembayaran</button>
-        </form>
-    </div>
-    <p th:if="${payment.status() != 'PENDING'}">Pembayaran ini sudah diproses.</p>
+    <!-- ════ Main Content ════ -->
+    <main class="main">
+        <h1 class="page-heading">Gateway Sandbox</h1>
 
-    <p><a th:href="@{/orders/{code}(code=${payment.orderCode()})}">&larr; Kembali ke order</a></p>
+        <div class="content-wrapper">
+
+            <!-- Warning Banner -->
+            <div class="warning-banner">
+                <span class="icon">⚠️</span>
+                <span>Halaman ini tiruan untuk latihan. Tidak ada uang sungguhan.</span>
+            </div>
+
+            <!-- Payment Details -->
+            <div class="glass-card">
+                <table class="detail-table">
+                    <tr>
+                        <td class="label-col">Nomor pembayaran</td>
+                        <td class="value-col" th:text="${payment.gatewayRef()}">REF-001</td>
+                    </tr>
+                    <tr>
+                        <td class="label-col">Kode order</td>
+                        <td class="value-col" th:text="${payment.orderCode()}">ORD-001</td>
+                    </tr>
+                    <tr>
+                        <td class="label-col">Jumlah</td>
+                        <td class="value-col" th:text="'Rp ' + ${#numbers.formatDecimal(payment.amount(), 0, 'POINT', 0, 'COMMA')}">Rp 50.000</td>
+                    </tr>
+                    <tr>
+                        <td class="label-col">Status</td>
+                        <td class="value-col">
+                            <span class="status-badge status-pending"
+                                  th:if="${payment.status() == 'PENDING'}"
+                                  th:text="${payment.status()}">PENDING</span>
+                            <span class="status-badge status-paid"
+                                  th:if="${payment.status() == 'PAID'}"
+                                  th:text="${payment.status()}">PAID</span>
+                            <span class="status-badge status-failed"
+                                  th:if="${payment.status() == 'FAILED'}"
+                                  th:text="${payment.status()}">FAILED</span>
+                            <span class="status-badge status-expired"
+                                  th:if="${payment.status() == 'EXPIRED'}"
+                                  th:text="${payment.status()}">EXPIRED</span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Action Buttons (PENDING only) -->
+            <div class="action-row" th:if="${payment.status() == 'PENDING'}">
+                <form th:action="@{/sandbox/pay/{ref}/complete(ref=${payment.gatewayRef()})}" method="post">
+                    <input type="hidden" name="result" value="PAID"/>
+                    <button type="submit" class="btn btn-success">✅ Bayar (sukses)</button>
+                </form>
+                <form th:action="@{/sandbox/pay/{ref}/complete(ref=${payment.gatewayRef()})}" method="post">
+                    <input type="hidden" name="result" value="FAILED"/>
+                    <button type="submit" class="btn btn-danger">❌ Gagalkan</button>
+                </form>
+            </div>
+
+            <!-- Already Processed Message -->
+            <div class="processed-msg" th:if="${payment.status() != 'PENDING'}">
+                Pembayaran ini sudah diproses.
+            </div>
+
+            <!-- Back Link -->
+            <a class="back-link" th:href="@{/orders/{code}(code=${payment.orderCode()})}">← Kembali ke order</a>
+
+        </div>
+    </main>
+
+    <!-- ════ Footer ════ -->
+    <footer class="footer">
+        &copy; 2025 VinStore. Sandbox environment — for testing only.
+    </footer>
+
 </body>
 </html>

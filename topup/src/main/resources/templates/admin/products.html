@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Produk')}"></head>
+<body>
+<nav th:replace="~{fragments :: nav}"></nav>
+<h1>Produk: <span th:text="${game.name}">Nama Game</span></h1>
+<p><a th:href="@{/admin/games}">&larr; Kembali ke daftar game</a></p>
+<p class="error" th:if="${error}" th:text="${error}">Error</p>
+
+<h2>Daftar produk</h2>
+<p th:if="${#lists.isEmpty(products)}">Belum ada produk.</p>
+<form class="row" th:each="product : ${products}"
+      th:action="@{/admin/products/{id}(id=${product.id})}" method="post">
+    <input type="text" name="name" th:value="${product.name}" required>
+    <input type="number" name="price" th:value="${product.price}" min="1000" step="1" required>
+    <label><input type="checkbox" name="active" value="true" th:checked="${product.active}"> Aktif</label>
+    <button type="submit">Simpan</button>
+</form>
+
+<h2>Tambah produk</h2>
+<form th:action="@{/admin/games/{id}/products(id=${game.id})}" th:object="${productForm}" method="post">
+    <p class="field">
+        <label for="name">Nama (contoh: 86 Diamonds)</label><br>
+        <input type="text" id="name" th:field="*{name}">
+    </p>
+    <p class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Error</p>
+
+    <p>
+        <label for="price">Harga (Rupiah)</label><br>
+        <input type="number" id="price" th:field="*{price}" min="1000" step="1">
+    </p>
+    <p class="error" th:if="${#fields.hasErrors('price')}" th:errors="*{price}">Error</p>
+
+    <button type="submit">Tambah</button>
+</form>
+</body>
+</html>

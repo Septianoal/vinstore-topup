@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Order')}"></head>
+<body>
+<nav th:replace="~{fragments :: nav}"></nav>
+<h1>Order</h1>
+
+<form class="row" method="get" th:action="@{/admin/orders}">
+    <label for="status">Status</label>
+    <select id="status" name="status">
+        <option value="">Semua</option>
+        <option th:each="s : ${statuses}" th:value="${s.name()}" th:text="${s.name()}"
+                th:selected="${s.name() == selected}">PENDING</option>
+    </select>
+    <button type="submit">Terapkan</button>
+</form>
+<p>Menampilkan maksimal 100 order terbaru.</p>
+
+<table>
+    <thead>
+    <tr><th>Kode</th><th>Game</th><th>Nominal</th><th>User ID</th><th>Kontak</th><th>Total</th><th>Status</th><th>Dibuat</th></tr>
+    </thead>
+    <tbody>
+    <tr th:each="o : ${orders}">
+        <td th:text="${o.orderCode()}">VS-261022-ABC234</td>
+        <td th:text="${o.gameName()}">Free Fire</td>
+        <td th:text="${o.productName()}">70 Diamonds</td>
+        <td th:text="${o.gameUserId()}">123456</td>
+        <td th:text="${o.contact()}">a@contoh.com</td>
+        <td th:text="'Rp ' + ${#numbers.formatDecimal(o.totalPrice(), 0, 'POINT', 0, 'COMMA')}">Rp 10.000</td>
+        <td th:text="${o.status()}">PENDING</td>
+        <td th:text="${#temporals.format(o.createdAt(), 'dd MMM yyyy HH:mm')}">22 Okt 2026 10:00</td>
+    </tr>
+    </tbody>
+</table>
+<p th:if="${#lists.isEmpty(orders)}">Belum ada order.</p>
+</body>
+</html>
